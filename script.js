@@ -12,32 +12,38 @@ const ICONS = {
 
 const linksConfig = [
   {
-    text: "Feb 18th - Open Mic Comedy @ Cafe De Buurvrouw",
+    title: "Feb 18th",
+    subtitle: "Open Mic Comedy @ Cafe De Buurvrouw",
     link: "https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462",
     icon: ICONS.mic
   },
   {
-    text: "Feb 19th - That Comedy Thing @ Oosterbar",
+    title: "Feb 19th",
+    subtitle: "That Comedy Thing @ Oosterbar",
     link: "https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982455332265",
     icon: ICONS.mic
   },
   {
-    text: "Feb 26th - That Comedy Thing @ Oosterbar",
+    title: "Feb 26th",
+    subtitle: "That Comedy Thing @ Oosterbar",
     link: "https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982461979146",
     icon: ICONS.mic
   },
   {
-    text: "March 4th - Open Mic Comedy @ Cafe De Buurvrouw",
+    title: "March 4th",
+    subtitle: "Open Mic Comedy @ Cafe De Buurvrouw",
     link: "https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462",
     icon: ICONS.mic
   },
   {
-    text: "@spinstead.gif on instagram",
-            link: "https://www.instagram.com/spinstead.gif/",
+    title: "@spinstead.gif",
+    subtitle: "Instagram",
+    link: "https://www.instagram.com/spinstead.gif/",
     icon: ICONS.instagram
   },
   {
-    text: "David Swinstead on LinkedIn (not comedy related - mainly CRO and AI content) ",
+    title: "David Swinstead",
+    subtitle: "LinkedIn (CRO and AI content)",
     link: "https://www.linkedin.com/in/david-swinstead-09267030/",
     icon: ICONS.linkedin
   }
@@ -70,7 +76,17 @@ linksConfig.forEach((item, index) => {
 
   const text = document.createElement("span");
   text.className = "link-text";
-  text.textContent = item.text;
+
+  const title = document.createElement("span");
+  title.className = "link-title";
+  title.textContent = item.title;
+
+  const subtitle = document.createElement("span");
+  subtitle.className = "link-subtitle";
+  subtitle.textContent = item.subtitle;
+
+  text.appendChild(title);
+  text.appendChild(subtitle);
 
   anchor.appendChild(icon);
   anchor.appendChild(text);
