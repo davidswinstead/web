@@ -1,0 +1,5 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/a2bremov/davidswinstead.com/links/
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/rsync -av --delete --exclude '.git' --exclude '.cpanel.yml' ./ $DEPLOYPATH
