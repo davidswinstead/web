@@ -1,69 +1,10 @@
 <?php
 $rootDir = dirname(__DIR__);
-$dataPath = $rootDir . "/data/data.js";
-$csvPath = $rootDir . "/data/links.csv";
 $dbPath = $rootDir . "/data/links.sqlite";
 
 function h($value)
 {
   return htmlspecialchars($value ?? "", ENT_QUOTES, "UTF-8");
-}
-
-function readDataFile($path)
-{
-  if (!file_exists($path)) {
-    return [];
-  }
-
-  $contents = file_get_contents($path);
-  if ($contents === false) {
-    return [];
-  }
-
-  $start = strpos($contents, "[");
-  $end = strrpos($contents, "]");
-  if ($start === false || $end === false || $end <= $start) {
-    return [];
-  }
-
-  $json = substr($contents, $start, $end - $start + 1);
-  $data = json_decode($json, true);
-  if (!is_array($data)) {
-    return [];
-  }
-
-  return $data;
-}
-
-function writeCsvFile($path, $items)
-{
-  $lines = ["date,title,subtitle,link,icon"];
-  foreach ($items as $item) {
-    $row = [
-      $item["date"] ?? "",
-      $item["title"] ?? "",
-      $item["subtitle"] ?? "",
-      $item["link"] ?? "",
-      $item["icon"] ?? ""
-    ];
-    $escaped = array_map(function ($value) {
-      $value = str_replace('"', '""', $value);
-      if (preg_match('/[",\n\r]/', $value)) {
-        return '"' . $value . '"';
-      }
-      return $value;
-    }, $row);
-    $lines[] = implode(",", $escaped);
-  }
-
-  return file_put_contents($path, implode("\n", $lines) . "\n");
-}
-
-function writeDataFile($path, $items)
-{
-  $json = json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-  $payload = "const data = " . $json . ";\n";
-  return file_put_contents($path, $payload);
 }
 
 function connectDatabase($dbPath)
@@ -139,10 +80,7 @@ try {
   $pdo = connectDatabase($dbPath);
 
   if (!$dbExists) {
-    $seed = readDataFile($dataPath);
-    if ($seed) {
-      seedDatabase($pdo, $seed);
-    }
+    seedDatabase($pdo, []);
   }
 
   if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -181,11 +119,7 @@ try {
     }
 
     saveLinks($pdo, $items);
-    if (writeCsvFile($csvPath, $items) === false || writeDataFile($dataPath, $items) === false) {
-      $notice = "Saved to SQLite, but failed to write CSV or data.js. Check /data permissions.";
-    } else {
-      $notice = "Saved successfully.";
-    }
+    $notice = "Saved successfully.";
   }
 
   $data = fetchLinks($pdo);

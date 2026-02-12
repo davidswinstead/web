@@ -2,10 +2,8 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/a2bremov/swinstead.lol/
     - /bin/mkdir -p $DEPLOYPATH
-    - /bin/rsync -av --delete --exclude '.git' --exclude '.cpanel.yml' --exclude 'data/data.js' --exclude 'data/links.csv' --exclude 'data/links.sqlite' ./ $DEPLOYPATH
+    - /bin/rsync -av --delete --exclude '.git' --exclude '.cpanel.yml' --exclude 'data/links.sqlite' ./ $DEPLOYPATH
     - /bin/mkdir -p $DEPLOYPATH/data
-    - if [ ! -f $DEPLOYPATH/data/data.js ]; then /bin/cp ./data/data.js $DEPLOYPATH/data/data.js; fi
-    - if [ ! -f $DEPLOYPATH/data/links.csv ]; then /bin/cp ./data/links.csv $DEPLOYPATH/data/links.csv; fi
     - /usr/bin/find $DEPLOYPATH -type d -exec /bin/chmod 755 {} +
     - /usr/bin/find $DEPLOYPATH -type f -exec /bin/chmod 644 {} +
     - /bin/chmod 775 $DEPLOYPATH/data
