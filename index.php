@@ -86,9 +86,14 @@ $iconMap = [
                 $subtitleValue = formatDateLabel($item["date"] ?? "");
             }
             $iconKey = trim($item["icon"] ?? "");
+            $hasLink = !empty($item["link"]);
           ?>
           <li class="link-item">
-            <a class="link-button" href="<?php echo h($item["link"] ?? "#"); ?>" target="_blank" rel="noopener noreferrer">
+            <?php if ($hasLink) : ?>
+            <a class="link-button" href="<?php echo h($item["link"]); ?>" target="_blank" rel="noopener noreferrer">
+            <?php else : ?>
+            <div class="link-button">
+            <?php endif; ?>
               <span class="link-icon">
                 <?php if ($iconKey === "instagram") : ?>
                   <img src="instagram.png" alt="Instagram" loading="lazy" />
@@ -104,7 +109,11 @@ $iconMap = [
                 <span class="link-title"><?php echo h($item["title"] ?? ""); ?></span>
                 <span class="link-subtitle"><?php echo h($subtitleValue); ?></span>
               </span>
+            <?php if ($hasLink) : ?>
             </a>
+            <?php else : ?>
+            </div>
+            <?php endif; ?>
           </li>
           <?php endforeach; ?>
         </ul>
