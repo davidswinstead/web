@@ -6,11 +6,12 @@ if (file_exists($dbPath)) {
     try {
         $pdo = new PDO("sqlite:" . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $today = date("Ymd");
         $stmt = $pdo->query(
             "SELECT date, title, subtitle, link, icon
              FROM links
+             WHERE REPLACE(REPLACE(date, '/', ''), '-', '') >= '$today'
              ORDER BY
-          CASE WHEN date IS NULL OR date = '' THEN 1 ELSE 0 END ASC,
           REPLACE(date, '/', '-') ASC,
           position ASC,
           id ASC"
@@ -24,19 +25,6 @@ if (file_exists($dbPath)) {
 function h($value)
 {
     return htmlspecialchars($value ?? "", ENT_QUOTES, "UTF-8");
-}
-
-function isUpcoming($dateString)
-{
-    if (!$dateString) {
-        return true;
-    }
-    $normalized = preg_replace("/\D/", "", $dateString);
-    if (strlen($normalized) < 8) {
-        return true;
-    }
-    $today = date("Ymd");
-    return $normalized >= $today;
 }
 
 function formatDateLabel($dateString)
@@ -72,10 +60,6 @@ $iconMap = [
     "camera" => "📸",
     "time" => "🕞"
 ];
-
-$visibleItems = array_values(array_filter($items, function ($item) {
-    return isUpcoming($item["date"] ?? "");
-}));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +79,7 @@ $visibleItems = array_values(array_filter($items, function ($item) {
           </div>
         </div>
         <ul class="links" id="links">
-          <?php foreach ($visibleItems as $item) : ?>
+          <?php foreach ($items as $item) : ?>
           <?php
             $subtitleValue = trim($item["subtitle"] ?? "");
             if ($subtitleValue === "") {
