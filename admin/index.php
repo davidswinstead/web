@@ -162,7 +162,7 @@ try {
         color: var(--text);
         padding: 32px 20px 64px;
       }
-      .container {
+      body > main {
         max-width: 1100px;
         margin: 0 auto;
         display: grid;
@@ -311,7 +311,7 @@ try {
     </style>
   </head>
   <body>
-    <div class="container">
+    <main>
       <header>
         <h1>Link Hub Admin</h1>
         <p>Edit the list below. Changes update both the JSON data file and the CSV used by the public page.</p>
@@ -393,7 +393,7 @@ try {
         </div>
         <p class="help">Icons are limited to the dropdown choices.</p>
       </form>
-    </div>
+    </main>
 
     <template id="row-template">
       <tr>
