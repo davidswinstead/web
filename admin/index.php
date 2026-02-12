@@ -162,9 +162,6 @@ try {
       }
 
       $date = trim($dates[$i] ?? "");
-      if ($date !== "") {
-        $date = str_replace("-", "/", $date);
-      }
       $title = trim($titles[$i] ?? "");
       $subtitle = trim($subtitles[$i] ?? "");
       $link = trim($links[$i] ?? "");
@@ -381,13 +378,7 @@ try {
             <tr>
               <td>
                 <label>Date</label>
-                <input
-                  type="text"
-                  name="date[]"
-                  placeholder="YYYY/MM/DD"
-                  pattern="\d{4}/\d{2}/\d{2}"
-                  value="<?php echo h(str_replace('-', '/', $item['date'] ?? '')); ?>"
-                />
+                <input type="date" name="date[]" value="<?php echo h($item['date'] ?? ''); ?>" />
               </td>
               <td>
                 <label>Title</label>
@@ -438,7 +429,7 @@ try {
       <tr>
         <td>
           <label>Date</label>
-          <input type="text" name="date[]" placeholder="YYYY/MM/DD" pattern="\d{4}/\d{2}/\d{2}" />
+          <input type="date" name="date[]" />
         </td>
         <td>
           <label>Title</label>
@@ -482,13 +473,13 @@ try {
       addRowButton.addEventListener("click", () => {
         const clone = template.content.cloneNode(true);
         const row = clone.querySelector("tr");
-        const dateInput = row.querySelector("input[name='date[]']");
+        const dateInput = row.querySelector("input[type='date']");
         if (dateInput) {
           const today = new Date();
           const yyyy = today.getFullYear();
           const mm = String(today.getMonth() + 1).padStart(2, "0");
           const dd = String(today.getDate()).padStart(2, "0");
-          dateInput.value = `${yyyy}/${mm}/${dd}`;
+          dateInput.value = `${yyyy}-${mm}-${dd}`;
         }
         rows.appendChild(clone);
       });
