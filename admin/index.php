@@ -162,6 +162,9 @@ try {
       }
 
       $date = trim($dates[$i] ?? "");
+      if ($date !== "") {
+        $date = str_replace("-", "/", $date);
+      }
       $title = trim($titles[$i] ?? "");
       $subtitle = trim($subtitles[$i] ?? "");
       $link = trim($links[$i] ?? "");
@@ -279,6 +282,15 @@ try {
         border-radius: 10px;
         font-size: 0.92rem;
       }
+      select {
+        width: 100%;
+        background: #0f1318;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: var(--text);
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 0.92rem;
+      }
       .actions {
         display: flex;
         flex-wrap: wrap;
@@ -369,7 +381,13 @@ try {
             <tr>
               <td>
                 <label>Date</label>
-                <input type="date" name="date[]" value="<?php echo h($item['date'] ?? ''); ?>" />
+                <input
+                  type="text"
+                  name="date[]"
+                  placeholder="YYYY/MM/DD"
+                  pattern="\d{4}/\d{2}/\d{2}"
+                  value="<?php echo h(str_replace('-', '/', $item['date'] ?? '')); ?>"
+                />
               </td>
               <td>
                 <label>Title</label>
@@ -385,7 +403,19 @@ try {
               </td>
               <td>
                 <label>Icon</label>
-                <input type="text" name="icon[]" value="<?php echo h($item['icon'] ?? ''); ?>" />
+                <select name="icon[]">
+                  <?php $iconValue = $item['icon'] ?? ''; ?>
+                  <option value="" <?php echo $iconValue === '' ? 'selected' : ''; ?>>None</option>
+                  <option value="mic" <?php echo $iconValue === 'mic' ? 'selected' : ''; ?>>Mic</option>
+                  <option value="instagram" <?php echo $iconValue === 'instagram' ? 'selected' : ''; ?>>Instagram</option>
+                  <option value="linkedin" <?php echo $iconValue === 'linkedin' ? 'selected' : ''; ?>>LinkedIn</option>
+                  <option value="spark" <?php echo $iconValue === 'spark' ? 'selected' : ''; ?>>Spark</option>
+                  <option value="mail" <?php echo $iconValue === 'mail' ? 'selected' : ''; ?>>Mail</option>
+                  <option value="podcast" <?php echo $iconValue === 'podcast' ? 'selected' : ''; ?>>Podcast</option>
+                  <option value="video" <?php echo $iconValue === 'video' ? 'selected' : ''; ?>>Video</option>
+                  <option value="camera" <?php echo $iconValue === 'camera' ? 'selected' : ''; ?>>Camera</option>
+                  <option value="time" <?php echo $iconValue === 'time' ? 'selected' : ''; ?>>Time</option>
+                </select>
               </td>
               <td class="delete-cell">
                 <label>Delete</label>
@@ -400,7 +430,7 @@ try {
           <button type="button" class="btn secondary" id="add-row">Add row</button>
           <button type="submit" class="btn">Save changes</button>
         </div>
-        <p class="help">Icons accept keys like <strong>mic</strong>, <strong>instagram</strong>, <strong>linkedin</strong>, or any emoji.</p>
+        <p class="help">Icons are limited to the dropdown choices.</p>
       </form>
     </div>
 
@@ -408,7 +438,7 @@ try {
       <tr>
         <td>
           <label>Date</label>
-          <input type="date" name="date[]" />
+          <input type="text" name="date[]" placeholder="YYYY/MM/DD" pattern="\d{4}/\d{2}/\d{2}" />
         </td>
         <td>
           <label>Title</label>
@@ -424,7 +454,18 @@ try {
         </td>
         <td>
           <label>Icon</label>
-          <input type="text" name="icon[]" />
+          <select name="icon[]">
+            <option value="" selected>None</option>
+            <option value="mic">Mic</option>
+            <option value="instagram">Instagram</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="spark">Spark</option>
+            <option value="mail">Mail</option>
+            <option value="podcast">Podcast</option>
+            <option value="video">Video</option>
+            <option value="camera">Camera</option>
+            <option value="time">Time</option>
+          </select>
         </td>
         <td class="delete-cell">
           <label>Delete</label>
@@ -441,13 +482,13 @@ try {
       addRowButton.addEventListener("click", () => {
         const clone = template.content.cloneNode(true);
         const row = clone.querySelector("tr");
-        const dateInput = row.querySelector("input[type='date']");
+        const dateInput = row.querySelector("input[name='date[]']");
         if (dateInput) {
           const today = new Date();
           const yyyy = today.getFullYear();
           const mm = String(today.getMonth() + 1).padStart(2, "0");
           const dd = String(today.getDate()).padStart(2, "0");
-          dateInput.value = `${yyyy}-${mm}-${dd}`;
+          dateInput.value = `${yyyy}/${mm}/${dd}`;
         }
         rows.appendChild(clone);
       });

@@ -66,6 +66,17 @@ function iconFromValue(value) {
   return trimmed;
 }
 
+function isUpcoming(dateString) {
+  if (!dateString) return true;
+  const normalized = dateString.replace(/\//g, "-");
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  const todayString = `${yyyy}-${mm}-${dd}`;
+  return normalized >= todayString;
+}
+
 function renderLinks(linksConfig) {
   linksList.innerHTML = "";
 
@@ -130,12 +141,15 @@ async function loadLinksFromCSV() {
     return acc;
   }, {});
 
-  return dataRows.map((cols) => ({
-    title: cols[colIndex.title] || "",
-    subtitle: cols[colIndex.subtitle] || "",
-    link: cols[colIndex.link] || "",
-    icon: iconFromValue(cols[colIndex.icon] || "")
-  }));
+  return dataRows
+    .map((cols) => ({
+      date: cols[colIndex.date] || "",
+      title: cols[colIndex.title] || "",
+      subtitle: cols[colIndex.subtitle] || "",
+      link: cols[colIndex.link] || "",
+      icon: iconFromValue(cols[colIndex.icon] || "")
+    }))
+    .filter((item) => isUpcoming(item.date));
 }
 
 loadLinksFromCSV()
