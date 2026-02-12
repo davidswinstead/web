@@ -150,7 +150,8 @@ function renderLinks(linksConfig) {
 
     const subtitle = document.createElement("span");
     subtitle.className = "link-subtitle";
-    subtitle.textContent = item.subtitle || formatDateLabel(item.date);
+    const subtitleValue = typeof item.subtitle === "string" ? item.subtitle.trim() : "";
+    subtitle.textContent = subtitleValue || formatDateLabel(item.date);
 
     text.appendChild(title);
     text.appendChild(subtitle);

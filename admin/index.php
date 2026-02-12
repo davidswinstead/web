@@ -386,7 +386,13 @@ try {
               </td>
               <td>
                 <label>Subtitle</label>
-                <input type="text" name="subtitle[]" value="<?php echo h($item['subtitle'] ?? ''); ?>" />
+                <input
+                  type="text"
+                  name="subtitle[]"
+                  placeholder="defaults to show the date"
+                  value="<?php echo h($item['subtitle'] ?? ''); ?>"
+                />
+                <div class="help">Optional.</div>
               </td>
               <td>
                 <label>Link</label>
@@ -437,7 +443,8 @@ try {
         </td>
         <td>
           <label>Subtitle</label>
-          <input type="text" name="subtitle[]" />
+          <input type="text" name="subtitle[]" placeholder="defaults to show the date" />
+          <div class="help">Optional.</div>
         </td>
         <td>
           <label>Link</label>
