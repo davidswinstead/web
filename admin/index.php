@@ -262,18 +262,29 @@ try {
         margin-top: 6px;
       }
       @media (max-width: 900px) {
+        body {
+          padding: 20px 14px 40px;
+        }
+        body > main {
+          gap: 16px;
+        }
         table, thead, tbody, th, td, tr {
           display: block;
         }
         thead {
           display: none;
         }
+        form {
+          padding: 0;
+          border: none;
+          background: transparent;
+        }
         tr {
           border: 1px solid rgba(255, 255, 255, 0.14);
-          border-radius: 14px;
+          border-radius: 12px;
           padding: 12px;
-          margin-bottom: 14px;
-          background: rgba(0, 0, 0, 0.2);
+          margin-bottom: 12px;
+          background: rgba(0, 0, 0, 0.16);
         }
         td {
           border-bottom: none;
@@ -300,9 +311,6 @@ try {
       @media (max-width: 520px) {
         body {
           padding: 24px 16px 56px;
-        }
-        form {
-          padding: 14px;
         }
         tr {
           padding: 10px;
