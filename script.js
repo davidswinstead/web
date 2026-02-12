@@ -77,6 +77,44 @@ function isUpcoming(dateString) {
   return normalized >= todayString;
 }
 
+function formatDateLabel(dateString) {
+  if (!dateString) return "";
+  const parts = dateString.split(/[-/]/).map((value) => value.trim());
+  if (parts.length < 3) return dateString;
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+  if (!year || !month || !day) return dateString;
+  const date = new Date(year, month - 1, day);
+  if (Number.isNaN(date.getTime())) return dateString;
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
+
+  const suffix =
+    day % 10 === 1 && day % 100 !== 11
+      ? "st"
+      : day % 10 === 2 && day % 100 !== 12
+        ? "nd"
+        : day % 10 === 3 && day % 100 !== 13
+          ? "rd"
+          : "th";
+
+  return `${months[date.getMonth()]} ${day}${suffix}`;
+}
+
 function renderLinks(linksConfig) {
   linksList.innerHTML = "";
 
@@ -112,7 +150,7 @@ function renderLinks(linksConfig) {
 
     const subtitle = document.createElement("span");
     subtitle.className = "link-subtitle";
-    subtitle.textContent = item.subtitle;
+    subtitle.textContent = item.subtitle || formatDateLabel(item.date);
 
     text.appendChild(title);
     text.appendChild(subtitle);
