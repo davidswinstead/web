@@ -6,32 +6,7 @@ $dbPath = $rootDir . "/data/links.sqlite";
 
 function isLoggedIn()
 {
-    if (isset($_SESSION["admin_user"])) {
-        return true;
-    }
-
-    if (isset($_COOKIE["admin_token"])) {
-        $token = $_COOKIE["admin_token"];
-        try {
-            $pdo = new PDO("sqlite:" . $GLOBALS["dbPath"]);
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $stmt = $pdo->prepare("SELECT id, username FROM users WHERE token = :token AND token_expires > :now LIMIT 1");
-            $stmt->execute([
-                ":token" => $token,
-                ":now" => date("c")
-            ]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($user) {
-                $_SESSION["admin_user"] = $user["username"];
-                $_SESSION["admin_id"] = $user["id"];
-                return true;
-            }
-        } catch (Throwable $e) {
-            return false;
-        }
-    }
-
-    return false;
+    return isset($_SESSION["admin_user"]);
 }
 
 $login_error = "";
@@ -49,17 +24,6 @@ if (!isLoggedIn() && $_SERVER["REQUEST_METHOD"] === "POST") {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user["password_hash"])) {
-            $token = bin2hex(random_bytes(32));
-            $expires = date("c", time() + 90 * 24 * 60 * 60);
-
-            $updateStmt = $pdo->prepare("UPDATE users SET token = :token, token_expires = :expires WHERE id = :id");
-            $updateStmt->execute([
-                ":token" => $token,
-                ":expires" => $expires,
-                ":id" => $user["id"]
-            ]);
-
-            setcookie("admin_token", $token, time() + 90 * 24 * 60 * 60, "/admin/", "", true, true);
             $_SESSION["admin_user"] = $user["username"];
             $_SESSION["admin_id"] = $user["id"];
             header("Location: index.php");
@@ -75,7 +39,6 @@ if (!isLoggedIn() && $_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 if (isset($_GET["logout"])) {
-    setcookie("admin_token", "", time() - 3600, "/admin/");
     session_destroy();
     header("Refresh: 0");
     exit;
