@@ -59,6 +59,19 @@ function fetchLinks(PDO $pdo)
   return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 
+function isUpcomingDate($dateString)
+{
+  if (!$dateString) {
+    return true;
+  }
+  $normalized = preg_replace("/\D/", "", $dateString);
+  if (strlen($normalized) < 8) {
+    return true;
+  }
+  $today = date("Ymd");
+  return $normalized >= $today;
+}
+
 function saveLinks(PDO $pdo, $items)
 {
   $pdo->beginTransaction();
@@ -135,6 +148,13 @@ try {
   $error = $exception->getMessage();
   $data = [];
 }
+
+$upcoming = array_values(array_filter($data, function ($item) {
+  return isUpcomingDate($item["date"] ?? "");
+}));
+$past = array_values(array_filter($data, function ($item) {
+  return !isUpcomingDate($item["date"] ?? "");
+}));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -334,6 +354,8 @@ try {
       <?php endif; ?>
 
       <form method="post">
+        <?php $rowIndex = 0; ?>
+        <h2>Upcoming</h2>
         <table>
           <thead>
             <tr>
@@ -346,7 +368,12 @@ try {
             </tr>
           </thead>
           <tbody id="rows">
-            <?php foreach ($data as $index => $item) : ?>
+            <?php if (!$upcoming) : ?>
+            <tr>
+              <td colspan="6" class="help">No upcoming entries.</td>
+            </tr>
+            <?php endif; ?>
+            <?php foreach ($upcoming as $item) : ?>
             <tr>
               <td>
                 <label>Date</label>
@@ -364,7 +391,7 @@ try {
                   placeholder="defaults to show the date"
                   value="<?php echo h($item['subtitle'] ?? ''); ?>"
                 />
-                <div class="help">Optional.</div>
+                <div class="help inline">Optional.</div>
               </td>
               <td>
                 <label>Link</label>
@@ -388,9 +415,78 @@ try {
               </td>
               <td class="delete-cell">
                 <label>Delete</label>
-                <input type="checkbox" name="delete[]" value="<?php echo $index; ?>" />
+                <input type="checkbox" name="delete[]" value="<?php echo $rowIndex; ?>" />
               </td>
             </tr>
+            <?php $rowIndex++; ?>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+
+        <h2>Past</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Title</th>
+              <th>Subtitle</th>
+              <th>Link</th>
+              <th>Icon</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="past-rows">
+            <?php if (!$past) : ?>
+            <tr>
+              <td colspan="6" class="help">No past entries.</td>
+            </tr>
+            <?php endif; ?>
+            <?php foreach ($past as $item) : ?>
+            <tr class="past-row">
+              <td>
+                <label>Date</label>
+                <input type="date" name="date[]" value="<?php echo h($item['date'] ?? ''); ?>" />
+              </td>
+              <td>
+                <label>Title</label>
+                <input type="text" name="title[]" value="<?php echo h($item['title'] ?? ''); ?>" />
+              </td>
+              <td>
+                <label>Subtitle</label>
+                <input
+                  type="text"
+                  name="subtitle[]"
+                  placeholder="defaults to show the date"
+                  value="<?php echo h($item['subtitle'] ?? ''); ?>"
+                />
+                <div class="help inline">Optional.</div>
+              </td>
+              <td>
+                <label>Link</label>
+                <input type="url" name="link[]" value="<?php echo h($item['link'] ?? ''); ?>" />
+              </td>
+              <td>
+                <label>Icon</label>
+                <select name="icon[]">
+                  <?php $iconValue = $item['icon'] ?? ''; ?>
+                  <option value="" <?php echo $iconValue === '' ? 'selected' : ''; ?>>None</option>
+                  <option value="mic" <?php echo $iconValue === 'mic' ? 'selected' : ''; ?>>Mic</option>
+                  <option value="instagram" <?php echo $iconValue === 'instagram' ? 'selected' : ''; ?>>Instagram</option>
+                  <option value="linkedin" <?php echo $iconValue === 'linkedin' ? 'selected' : ''; ?>>LinkedIn</option>
+                  <option value="spark" <?php echo $iconValue === 'spark' ? 'selected' : ''; ?>>Spark</option>
+                  <option value="mail" <?php echo $iconValue === 'mail' ? 'selected' : ''; ?>>Mail</option>
+                  <option value="podcast" <?php echo $iconValue === 'podcast' ? 'selected' : ''; ?>>Podcast</option>
+                  <option value="video" <?php echo $iconValue === 'video' ? 'selected' : ''; ?>>Video</option>
+                  <option value="camera" <?php echo $iconValue === 'camera' ? 'selected' : ''; ?>>Camera</option>
+                  <option value="time" <?php echo $iconValue === 'time' ? 'selected' : ''; ?>>Time</option>
+                </select>
+              </td>
+              <td class="delete-cell">
+                <label>Delete</label>
+                <input type="checkbox" name="delete[]" value="<?php echo $rowIndex; ?>" />
+              </td>
+            </tr>
+            <?php $rowIndex++; ?>
             <?php endforeach; ?>
           </tbody>
         </table>
