@@ -454,7 +454,6 @@ if ($loggedIn) {
       </div>
       <header>
         <h1>Link Hub Admin</h1>
-        <p>Edit the list below. Changes update both the JSON data file and the CSV used by the public page.</p>
       </header>
 
       <?php if ($notice) : ?>
@@ -467,6 +466,10 @@ if ($loggedIn) {
 
       <form method="post">
         <?php $rowIndex = 0; ?>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="add-row">Add row</button>
+          <button type="submit" class="btn">Save changes</button>
+        </div>
         <h2>Upcoming</h2>
         <table>
           <thead>
@@ -534,6 +537,11 @@ if ($loggedIn) {
             <?php endforeach; ?>
           </tbody>
         </table>
+
+        <div class="actions">
+          <button type="button" class="btn secondary" id="add-row">Add row</button>
+          <button type="submit" class="btn">Save changes</button>
+        </div>
 
         <h2>Past</h2>
         <table>
