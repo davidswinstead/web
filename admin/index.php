@@ -145,12 +145,12 @@ try {
     <style>
       :root {
         color-scheme: light dark;
-        --bg: #0c0f12;
-        --card: #151a1f;
-        --text: #f5f3ee;
-        --muted: #c2bdb4;
+        --bg: #0b0d10;
+        --card: #171c22;
+        --text: #f7f5f0;
+        --muted: #d3cbbf;
         --accent: #f6b857;
-        --border: rgba(255, 255, 255, 0.12);
+        --border: rgba(255, 255, 255, 0.18);
       }
       * {
         box-sizing: border-box;
@@ -158,9 +158,9 @@ try {
       body {
         margin: 0;
         font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-        background: radial-gradient(circle at top, rgba(246, 184, 87, 0.12), transparent 40%), var(--bg);
+        background: radial-gradient(circle at top, rgba(246, 184, 87, 0.16), transparent 40%), var(--bg);
         color: var(--text);
-        padding: 40px 24px 80px;
+        padding: 32px 20px 64px;
       }
       .container {
         max-width: 1100px;
@@ -192,7 +192,7 @@ try {
         background: var(--card);
         border-radius: 18px;
         border: 1px solid var(--border);
-        padding: 20px;
+        padding: 18px;
         display: grid;
         gap: 16px;
       }
@@ -203,7 +203,7 @@ try {
       th, td {
         text-align: left;
         padding: 10px 8px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         vertical-align: top;
       }
       th {
@@ -214,8 +214,8 @@ try {
       }
       input[type="text"], input[type="url"], input[type="date"] {
         width: 100%;
-        background: #0f1318;
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: #0d1116;
+        border: 1px solid rgba(255, 255, 255, 0.22);
         color: var(--text);
         padding: 8px 10px;
         border-radius: 10px;
@@ -223,8 +223,8 @@ try {
       }
       select {
         width: 100%;
-        background: #0f1318;
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: #0d1116;
+        border: 1px solid rgba(255, 255, 255, 0.22);
         color: var(--text);
         padding: 8px 10px;
         border-radius: 10px;
@@ -249,7 +249,7 @@ try {
       .btn.secondary {
         background: transparent;
         color: var(--text);
-        border: 1px solid var(--border);
+        border: 1px solid rgba(255, 255, 255, 0.3);
       }
       .delete-cell {
         text-align: center;
@@ -257,6 +257,9 @@ try {
       .help {
         font-size: 0.85rem;
         color: var(--muted);
+      }
+      .help.inline {
+        margin-top: 6px;
       }
       @media (max-width: 900px) {
         table, thead, tbody, th, td, tr {
@@ -266,14 +269,15 @@ try {
           display: none;
         }
         tr {
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.14);
           border-radius: 14px;
           padding: 12px;
-          margin-bottom: 12px;
+          margin-bottom: 14px;
+          background: rgba(0, 0, 0, 0.2);
         }
         td {
           border-bottom: none;
-          padding: 6px 0;
+          padding: 6px 0 10px;
         }
         td label {
           display: block;
@@ -284,6 +288,24 @@ try {
         }
         .delete-cell {
           text-align: left;
+        }
+        .actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .btn {
+          width: 100%;
+        }
+      }
+      @media (max-width: 520px) {
+        body {
+          padding: 24px 16px 56px;
+        }
+        form {
+          padding: 14px;
+        }
+        tr {
+          padding: 10px;
         }
       }
     </style>
