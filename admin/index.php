@@ -47,7 +47,15 @@ function seedDatabase(PDO $pdo, $items)
 
 function fetchLinks(PDO $pdo)
 {
-  $stmt = $pdo->query("SELECT id, date, title, subtitle, link, icon FROM links ORDER BY position ASC, id ASC");
+  $stmt = $pdo->query(
+    "SELECT id, date, title, subtitle, link, icon
+     FROM links
+     ORDER BY
+      CASE WHEN date IS NULL OR date = '' THEN 1 ELSE 0 END ASC,
+      REPLACE(date, '/', '-') ASC,
+      position ASC,
+      id ASC"
+  );
   return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
 

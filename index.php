@@ -6,7 +6,15 @@ if (file_exists($dbPath)) {
     try {
         $pdo = new PDO("sqlite:" . $dbPath);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $stmt = $pdo->query("SELECT date, title, subtitle, link, icon FROM links ORDER BY position ASC, id ASC");
+        $stmt = $pdo->query(
+            "SELECT date, title, subtitle, link, icon
+             FROM links
+             ORDER BY
+          CASE WHEN date IS NULL OR date = '' THEN 1 ELSE 0 END ASC,
+          REPLACE(date, '/', '-') ASC,
+          position ASC,
+          id ASC"
+        );
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     } catch (Throwable $e) {
         $items = [];
