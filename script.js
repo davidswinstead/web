@@ -10,86 +10,136 @@ const ICONS = {
   time: "\ud83d\udd5e\ufe0f"
 };
 
-const linksConfig = [
-  {
-    title: "Feb 18th",
-    subtitle: "Open Mic Comedy @ Cafe De Buurvrouw",
-    link: "https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462",
-    icon: ICONS.mic
-  },
-  {
-    title: "Feb 19th",
-    subtitle: "That Comedy Thing @ Oosterbar",
-    link: "https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982455332265",
-    icon: ICONS.mic
-  },
-  {
-    title: "Feb 26th",
-    subtitle: "That Comedy Thing @ Oosterbar",
-    link: "https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982461979146",
-    icon: ICONS.mic
-  },
-  {
-    title: "March 4th",
-    subtitle: "Open Mic Comedy @ Cafe De Buurvrouw",
-    link: "https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462",
-    icon: ICONS.mic
-  },
-  {
-    title: "@spinstead.gif",
-    subtitle: "Instagram",
-    link: "https://www.instagram.com/spinstead.gif/",
-    icon: ICONS.instagram
-  },
-  {
-    title: "David Swinstead",
-    subtitle: "LinkedIn (CRO and AI content)",
-    link: "https://www.linkedin.com/in/david-swinstead-09267030/",
-    icon: ICONS.linkedin
-  }
-];
-
 const linksList = document.getElementById("links");
 
-linksConfig.forEach((item, index) => {
-  const listItem = document.createElement("li");
-  listItem.className = "link-item";
-  listItem.style.animationDelay = `${0.12 * index}s`;
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let inQuotes = false;
 
-  const anchor = document.createElement("a");
-  anchor.className = "link-button";
-  anchor.href = item.link;
-  anchor.target = "_blank";
-  anchor.rel = "noopener noreferrer";
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
 
-  const icon = document.createElement("span");
-  icon.className = "link-icon";
-  if (typeof item.icon === "string") {
-    icon.textContent = item.icon;
-  } else if (item.icon && item.icon.type === "img") {
-    const iconImage = document.createElement("img");
-    iconImage.src = item.icon.src;
-    iconImage.alt = item.icon.alt;
-    iconImage.loading = "lazy";
-    icon.appendChild(iconImage);
+    if (char === '"' && inQuotes && next === '"') {
+      cell += '"';
+      i++;
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === "," && !inQuotes) {
+      row.push(cell);
+      cell = "";
+      continue;
+    }
+
+    if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && next === "\n") i++;
+      row.push(cell);
+      if (row.some((val) => val.trim() !== "")) rows.push(row);
+      row = [];
+      cell = "";
+      continue;
+    }
+
+    cell += char;
   }
 
-  const text = document.createElement("span");
-  text.className = "link-text";
+  if (cell.length || row.length) {
+    row.push(cell);
+    if (row.some((val) => val.trim() !== "")) rows.push(row);
+  }
 
-  const title = document.createElement("span");
-  title.className = "link-title";
-  title.textContent = item.title;
+  return rows;
+}
 
-  const subtitle = document.createElement("span");
-  subtitle.className = "link-subtitle";
-  subtitle.textContent = item.subtitle;
+function iconFromValue(value) {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (ICONS[trimmed]) return ICONS[trimmed];
+  return trimmed;
+}
 
-  text.appendChild(title);
-  text.appendChild(subtitle);
+function renderLinks(linksConfig) {
+  linksList.innerHTML = "";
 
-  anchor.appendChild(icon);
-  anchor.appendChild(text);
-  listItem.appendChild(anchor);
-  linksList.appendChild(listItem);
-});
+  linksConfig.forEach((item, index) => {
+    const listItem = document.createElement("li");
+    listItem.className = "link-item";
+    listItem.style.animationDelay = `${0.12 * index}s`;
+
+    const anchor = document.createElement("a");
+    anchor.className = "link-button";
+    anchor.href = item.link;
+    anchor.target = "_blank";
+    anchor.rel = "noopener noreferrer";
+
+    const icon = document.createElement("span");
+    icon.className = "link-icon";
+    if (typeof item.icon === "string") {
+      icon.textContent = item.icon;
+    } else if (item.icon && item.icon.type === "img") {
+      const iconImage = document.createElement("img");
+      iconImage.src = item.icon.src;
+      iconImage.alt = item.icon.alt;
+      iconImage.loading = "lazy";
+      icon.appendChild(iconImage);
+    }
+
+    const text = document.createElement("span");
+    text.className = "link-text";
+
+    const title = document.createElement("span");
+    title.className = "link-title";
+    title.textContent = item.title;
+
+    const subtitle = document.createElement("span");
+    subtitle.className = "link-subtitle";
+    subtitle.textContent = item.subtitle;
+
+    text.appendChild(title);
+    text.appendChild(subtitle);
+
+    anchor.appendChild(icon);
+    anchor.appendChild(text);
+    listItem.appendChild(anchor);
+    linksList.appendChild(listItem);
+  });
+}
+
+async function loadLinksFromCSV() {
+  const response = await fetch("data/links.csv", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Failed to load CSV: ${response.status}`);
+  }
+
+  const text = await response.text();
+  const rows = parseCSV(text);
+
+  if (!rows.length) return [];
+
+  const [header, ...dataRows] = rows;
+  const colIndex = header.reduce((acc, col, i) => {
+    acc[col.trim().toLowerCase()] = i;
+    return acc;
+  }, {});
+
+  return dataRows.map((cols) => ({
+    title: cols[colIndex.title] || "",
+    subtitle: cols[colIndex.subtitle] || "",
+    link: cols[colIndex.link] || "",
+    icon: iconFromValue(cols[colIndex.icon] || "")
+  }));
+}
+
+loadLinksFromCSV()
+  .then(renderLinks)
+  .catch((error) => {
+    console.error(error);
+  });
