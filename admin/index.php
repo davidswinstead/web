@@ -62,7 +62,8 @@ if (!isLoggedIn() && $_SERVER["REQUEST_METHOD"] === "POST") {
             setcookie("admin_token", $token, time() + 90 * 24 * 60 * 60, "/admin/", "", true, true);
             $_SESSION["admin_user"] = $user["username"];
             $_SESSION["admin_id"] = $user["id"];
-            $loggedIn = true;
+            header("Location: index.php");
+            exit;
         } else {
             $login_error = "Invalid username or password.";
         }
