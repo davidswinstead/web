@@ -1,4 +1,0 @@
-AuthType Basic
-AuthName "Restricted Area"
-AuthUserFile /home/a2bremov/swinstead.lol/admin/.htpasswd
-Require valid-user

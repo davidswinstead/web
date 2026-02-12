@@ -1,6 +1,86 @@
 <?php
+session_start();
+
 $rootDir = dirname(__DIR__);
 $dbPath = $rootDir . "/data/links.sqlite";
+
+function isLoggedIn()
+{
+    if (isset($_SESSION["admin_user"])) {
+        return true;
+    }
+
+    if (isset($_COOKIE["admin_token"])) {
+        $token = $_COOKIE["admin_token"];
+        try {
+            $pdo = new PDO("sqlite:" . $GLOBALS["dbPath"]);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $pdo->prepare("SELECT id, username FROM users WHERE token = :token AND token_expires > :now LIMIT 1");
+            $stmt->execute([
+                ":token" => $token,
+                ":now" => date("c")
+            ]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($user) {
+                $_SESSION["admin_user"] = $user["username"];
+                $_SESSION["admin_id"] = $user["id"];
+                return true;
+            }
+        } catch (Throwable $e) {
+            return false;
+        }
+    }
+
+    return false;
+}
+
+$login_error = "";
+
+if (!isLoggedIn() && $_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = $_POST["username"] ?? "";
+    $password = $_POST["password"] ?? "";
+
+    try {
+        $pdo = new PDO("sqlite:" . $dbPath);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $stmt = $pdo->prepare("SELECT id, username, password_hash FROM users WHERE username = :username LIMIT 1");
+        $stmt->execute([":username" => $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user["password_hash"])) {
+            $token = bin2hex(random_bytes(32));
+            $expires = date("c", time() + 90 * 24 * 60 * 60);
+
+            $updateStmt = $pdo->prepare("UPDATE users SET token = :token, token_expires = :expires WHERE id = :id");
+            $updateStmt->execute([
+                ":token" => $token,
+                ":expires" => $expires,
+                ":id" => $user["id"]
+            ]);
+
+            setcookie("admin_token", $token, time() + 90 * 24 * 60 * 60, "/admin/", "", true, true);
+            $_SESSION["admin_user"] = $user["username"];
+            $_SESSION["admin_id"] = $user["id"];
+            $loggedIn = true;
+        } else {
+            $login_error = "Invalid username or password.";
+        }
+    } catch (Throwable $e) {
+        $login_error = "Login error: " . $e->getMessage();
+    }
+}
+
+if (isset($_GET["logout"])) {
+    setcookie("admin_token", "", time() - 3600, "/admin/");
+    session_destroy();
+    header("Refresh: 0");
+    exit;
+}
+
+$loggedIn = isLoggedIn();
+
+$GLOBALS["dbPath"] = $dbPath;
 
 function h($value)
 {
@@ -149,12 +229,14 @@ try {
   $data = [];
 }
 
-$upcoming = array_values(array_filter($data, function ($item) {
-  return isUpcomingDate($item["date"] ?? "");
-}));
-$past = array_values(array_filter($data, function ($item) {
-  return !isUpcomingDate($item["date"] ?? "");
-}));
+if ($loggedIn) {
+  $upcoming = array_values(array_filter($data, function ($item) {
+    return isUpcomingDate($item["date"] ?? "");
+  }));
+  $past = array_values(array_filter($data, function ($item) {
+    return !isUpcomingDate($item["date"] ?? "");
+  }));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -281,6 +363,47 @@ $past = array_values(array_filter($data, function ($item) {
       .help.inline {
         margin-top: 6px;
       }
+      .login-card {
+        max-width: 360px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+        margin: 0 auto;
+      }
+      .form-group {
+        display: grid;
+        gap: 6px;
+      }
+      .form-group label {
+        font-size: 0.9rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .form-group input[type="text"],
+      .form-group input[type="password"] {
+        background: #0d1116;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+      }
+      .form-group input:focus {
+        outline: none;
+        border-color: rgba(246, 184, 87, 0.6);
+      }
+      .login-error {
+        background: rgba(255, 96, 96, 0.15);
+        border: 1px solid rgba(255, 96, 96, 0.35);
+        color: var(--text);
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+      }
       @media (max-width: 900px) {
         body {
           padding: 20px 14px 40px;
@@ -340,6 +463,29 @@ $past = array_values(array_filter($data, function ($item) {
   </head>
   <body>
     <main>
+      <?php if (!$loggedIn) : ?>
+      <div class="login-card">
+        <h1>Admin Login</h1>
+        <?php if ($login_error) : ?>
+        <div class="login-error"><?php echo h($login_error); ?></div>
+        <?php endif; ?>
+        <form method="post">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required autofocus />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          <button type="submit" class="btn">Login</button>
+        </form>
+      </div>
+      <?php else : ?>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <div></div>
+        <a href="?logout=1" style="color: var(--muted); text-decoration: none; font-size: 0.9rem;">Logout</a>
+      </div>
       <header>
         <h1>Link Hub Admin</h1>
         <p>Edit the list below. Changes update both the JSON data file and the CSV used by the public page.</p>
@@ -559,5 +705,6 @@ $past = array_values(array_filter($data, function ($item) {
         rows.appendChild(clone);
       });
     </script>
+    <?php endif; ?>
   </body>
 </html>
