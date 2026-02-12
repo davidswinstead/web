@@ -66,6 +66,8 @@ if (!isLoggedIn() && $_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
             $login_error = "Invalid username or password.";
         }
+    } catch (PDOException $e) {
+        $login_error = "Database error: " . $e->getMessage() . " - Did you visit /admin/users.php first?";
     } catch (Throwable $e) {
         $login_error = "Login error: " . $e->getMessage();
     }
