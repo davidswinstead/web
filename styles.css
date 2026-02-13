@@ -130,13 +130,6 @@ body {
   color: var(--text-muted);
 }
 
-.footer {
-  text-align: center;
-  font-size: 0.85rem;
-  margin-top: 50px;
-  color: rgba(245, 243, 238, 0.08);
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;

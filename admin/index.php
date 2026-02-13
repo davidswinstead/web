@@ -467,7 +467,7 @@ if ($loggedIn) {
       <form method="post">
         <?php $rowIndex = 0; ?>
         <div class="actions">
-          <button type="button" class="btn secondary" id="add-row">Add row</button>
+          <button type="button" class="btn secondary js-add-row">Add row</button>
           <button type="submit" class="btn">Save changes</button>
         </div>
         <h2>Upcoming</h2>
@@ -539,7 +539,7 @@ if ($loggedIn) {
         </table>
 
         <div class="actions">
-          <button type="button" class="btn secondary" id="add-row">Add row</button>
+          <button type="button" class="btn secondary js-add-row">Add row</button>
           <button type="submit" class="btn">Save changes</button>
         </div>
 
@@ -612,7 +612,7 @@ if ($loggedIn) {
         </table>
 
         <div class="actions">
-          <button type="button" class="btn secondary" id="add-row">Add row</button>
+          <button type="button" class="btn secondary js-add-row">Add row</button>
           <button type="submit" class="btn">Save changes</button>
         </div>
         <p class="help">Icons are limited to the dropdown choices.</p>
@@ -661,22 +661,24 @@ if ($loggedIn) {
     </template>
 
     <script>
-      const addRowButton = document.getElementById("add-row");
+      const addRowButtons = document.querySelectorAll(".js-add-row");
       const rows = document.getElementById("rows");
       const template = document.getElementById("row-template");
 
-      addRowButton.addEventListener("click", () => {
-        const clone = template.content.cloneNode(true);
-        const row = clone.querySelector("tr");
-        const dateInput = row.querySelector("input[type='date']");
-        if (dateInput) {
-          const today = new Date();
-          const yyyy = today.getFullYear();
-          const mm = String(today.getMonth() + 1).padStart(2, "0");
-          const dd = String(today.getDate()).padStart(2, "0");
-          dateInput.value = `${yyyy}-${mm}-${dd}`;
-        }
-        rows.appendChild(clone);
+      addRowButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const clone = template.content.cloneNode(true);
+          const row = clone.querySelector("tr");
+          const dateInput = row.querySelector("input[type='date']");
+          if (dateInput) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, "0");
+            const dd = String(today.getDate()).padStart(2, "0");
+            dateInput.value = `${yyyy}-${mm}-${dd}`;
+          }
+          rows.appendChild(clone);
+        });
       });
     </script>
     <?php endif; ?>

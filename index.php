@@ -151,7 +151,6 @@ $iconMap = [
             </a>
           </li>
         </ul>
-        <footer class="footer">made you look</footer>
       </section>
     </main>
   </body>
