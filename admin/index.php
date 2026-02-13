@@ -321,6 +321,97 @@ if ($loggedIn) {
         border: 1px solid rgba(246, 184, 87, 0.4);
         color: var(--text);
       }
+      .section {
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(9, 11, 14, 0.7);
+        overflow: hidden;
+      }
+      .section + .section {
+        margin-top: 18px;
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        background: rgba(246, 184, 87, 0.12);
+        border-bottom: 1px solid rgba(246, 184, 87, 0.25);
+      }
+      .section-header h2 {
+        margin: 0;
+        font-size: 1.1rem;
+      }
+      .section-meta {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .section-body {
+        padding: 16px;
+        display: grid;
+        gap: 16px;
+      }
+      details.section-collapsible > summary {
+        list-style: none;
+        cursor: pointer;
+      }
+      details.section-collapsible > summary::-webkit-details-marker {
+        display: none;
+      }
+      details.section-collapsible > summary .section-meta::before {
+        content: "View";
+        margin-right: 8px;
+        color: var(--text);
+      }
+      details.section-collapsible[open] > summary .section-meta::before {
+        content: "Hide";
+      }
+      .csv-panel {
+        border-radius: 16px;
+        border: 1px dashed rgba(246, 184, 87, 0.5);
+        background: rgba(246, 184, 87, 0.08);
+        padding: 16px;
+        display: grid;
+        gap: 12px;
+      }
+      .csv-panel h3 {
+        margin: 0;
+        font-size: 1rem;
+      }
+      .csv-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      .file-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+      .file-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: var(--text);
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.2);
+      }
+      .csv-example {
+        background: rgba(0, 0, 0, 0.25);
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
       form {
         background: var(--card);
         border-radius: 18px;
@@ -535,159 +626,181 @@ if ($loggedIn) {
           <button type="button" class="btn secondary js-add-row">Add row</button>
           <button type="submit" class="btn">Save changes</button>
         </div>
-        <div class="actions" style="align-items: flex-end;">
-          <div style="flex: 1; min-width: 220px;">
-            <label for="csv_file" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Bulk CSV Upload</label>
-            <input type="file" id="csv_file" name="csv_file" accept=".csv,text/csv" />
+        <div class="csv-panel">
+          <h3>Bulk CSV Upload</h3>
+          <div class="help">Upload replaces all rows. Header must be: <strong>date,title,subtitle,link,icon</strong>.</div>
+          <div class="csv-actions">
+            <label class="file-label" for="csv_file">Choose CSV file</label>
+            <input type="file" id="csv_file" name="csv_file" class="file-input" accept=".csv,text/csv" />
+            <button type="submit" class="btn secondary" name="upload_csv" value="1">Upload CSV</button>
           </div>
-          <button type="submit" class="btn secondary" name="upload_csv" value="1">Upload CSV</button>
-        </div>
-        <div class="help">Upload replaces all rows. CSV header must be: <strong>date,title,subtitle,link,icon</strong>.</div>
-        <h2>Upcoming</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Title</th>
-              <th>Subtitle</th>
-              <th>Link</th>
-              <th>Icon</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody id="rows">
-            <?php if (!$upcoming) : ?>
-            <tr>
-              <td colspan="6" class="help">No upcoming entries.</td>
-            </tr>
-            <?php endif; ?>
-            <?php foreach ($upcoming as $item) : ?>
-            <tr>
-              <td>
-                <label>Date</label>
-                <input type="date" name="date[]" value="<?php echo h($item['date'] ?? ''); ?>" />
-              </td>
-              <td>
-                <label>Title</label>
-                <input type="text" name="title[]" value="<?php echo h($item['title'] ?? ''); ?>" />
-              </td>
-              <td>
-                <label>Subtitle</label>
-                <input
-                  type="text"
-                  name="subtitle[]"
-                  placeholder="defaults to show the date"
-                  value="<?php echo h($item['subtitle'] ?? ''); ?>"
-                />
-                <div class="help inline">Optional.</div>
-              </td>
-              <td>
-                <label>Link</label>
-                <input type="url" name="link[]" value="<?php echo h($item['link'] ?? ''); ?>" />
-              </td>
-              <td>
-                <label>Icon</label>
-                <select name="icon[]">
-                  <?php $iconValue = $item['icon'] ?? ''; ?>
-                  <option value="" <?php echo $iconValue === '' ? 'selected' : ''; ?>>None</option>
-                  <option value="mic" <?php echo $iconValue === 'mic' ? 'selected' : ''; ?>>Mic</option>
-                  <option value="instagram" <?php echo $iconValue === 'instagram' ? 'selected' : ''; ?>>Instagram</option>
-                  <option value="linkedin" <?php echo $iconValue === 'linkedin' ? 'selected' : ''; ?>>LinkedIn</option>
-                  <option value="spark" <?php echo $iconValue === 'spark' ? 'selected' : ''; ?>>Spark</option>
-                  <option value="mail" <?php echo $iconValue === 'mail' ? 'selected' : ''; ?>>Mail</option>
-                  <option value="podcast" <?php echo $iconValue === 'podcast' ? 'selected' : ''; ?>>Podcast</option>
-                  <option value="video" <?php echo $iconValue === 'video' ? 'selected' : ''; ?>>Video</option>
-                  <option value="camera" <?php echo $iconValue === 'camera' ? 'selected' : ''; ?>>Camera</option>
-                  <option value="time" <?php echo $iconValue === 'time' ? 'selected' : ''; ?>>Time</option>
-                </select>
-              </td>
-              <td class="delete-cell">
-                <label>Delete</label>
-                <input type="checkbox" name="delete[]" value="<?php echo $rowIndex; ?>" />
-              </td>
-            </tr>
-            <?php $rowIndex++; ?>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-
-        <div class="actions">
-          <button type="button" class="btn secondary js-add-row">Add row</button>
-          <button type="submit" class="btn">Save changes</button>
+          <details class="csv-example">
+            <summary>View CSV example</summary>
+            <pre>date,title,subtitle,link,icon
+2026-02-18,Feb 18th,Open Mic Comedy @ Cafe De Buurvrouw,https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462,mic
+2026-02-19,Feb 19th,That Comedy Thing @ Oosterbar,https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982455332265,mic
+2026-02-26,Feb 26th,That Comedy Thing @ Oosterbar,https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982461979146,mic
+2026-03-04,March 4th,Open Mic Comedy @ Cafe De Buurvrouw,https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462,mic</pre>
+          </details>
         </div>
 
-        <h2>Past</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Title</th>
-              <th>Subtitle</th>
-              <th>Link</th>
-              <th>Icon</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody id="past-rows">
-            <?php if (!$past) : ?>
-            <tr>
-              <td colspan="6" class="help">No past entries.</td>
-            </tr>
-            <?php endif; ?>
-            <?php foreach ($past as $item) : ?>
-            <tr class="past-row">
-              <td>
-                <label>Date</label>
-                <input type="date" name="date[]" value="<?php echo h($item['date'] ?? ''); ?>" />
-              </td>
-              <td>
-                <label>Title</label>
-                <input type="text" name="title[]" value="<?php echo h($item['title'] ?? ''); ?>" />
-              </td>
-              <td>
-                <label>Subtitle</label>
-                <input
-                  type="text"
-                  name="subtitle[]"
-                  placeholder="defaults to show the date"
-                  value="<?php echo h($item['subtitle'] ?? ''); ?>"
-                />
-                <div class="help inline">Optional.</div>
-              </td>
-              <td>
-                <label>Link</label>
-                <input type="url" name="link[]" value="<?php echo h($item['link'] ?? ''); ?>" />
-              </td>
-              <td>
-                <label>Icon</label>
-                <select name="icon[]">
-                  <?php $iconValue = $item['icon'] ?? ''; ?>
-                  <option value="" <?php echo $iconValue === '' ? 'selected' : ''; ?>>None</option>
-                  <option value="mic" <?php echo $iconValue === 'mic' ? 'selected' : ''; ?>>Mic</option>
-                  <option value="instagram" <?php echo $iconValue === 'instagram' ? 'selected' : ''; ?>>Instagram</option>
-                  <option value="linkedin" <?php echo $iconValue === 'linkedin' ? 'selected' : ''; ?>>LinkedIn</option>
-                  <option value="spark" <?php echo $iconValue === 'spark' ? 'selected' : ''; ?>>Spark</option>
-                  <option value="mail" <?php echo $iconValue === 'mail' ? 'selected' : ''; ?>>Mail</option>
-                  <option value="podcast" <?php echo $iconValue === 'podcast' ? 'selected' : ''; ?>>Podcast</option>
-                  <option value="video" <?php echo $iconValue === 'video' ? 'selected' : ''; ?>>Video</option>
-                  <option value="camera" <?php echo $iconValue === 'camera' ? 'selected' : ''; ?>>Camera</option>
-                  <option value="time" <?php echo $iconValue === 'time' ? 'selected' : ''; ?>>Time</option>
-                </select>
-              </td>
-              <td class="delete-cell">
-                <label>Delete</label>
-                <input type="checkbox" name="delete[]" value="<?php echo $rowIndex; ?>" />
-              </td>
-            </tr>
-            <?php $rowIndex++; ?>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
+        <section class="section">
+          <div class="section-header">
+            <h2>Upcoming</h2>
+            <div class="section-meta"><?php echo count($upcoming); ?> entries</div>
+          </div>
+          <div class="section-body">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Title</th>
+                  <th>Subtitle</th>
+                  <th>Link</th>
+                  <th>Icon</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody id="rows">
+                <?php if (!$upcoming) : ?>
+                <tr>
+                  <td colspan="6" class="help">No upcoming entries.</td>
+                </tr>
+                <?php endif; ?>
+                <?php foreach ($upcoming as $item) : ?>
+                <tr>
+                  <td>
+                    <label>Date</label>
+                    <input type="date" name="date[]" value="<?php echo h($item['date'] ?? ''); ?>" />
+                  </td>
+                  <td>
+                    <label>Title</label>
+                    <input type="text" name="title[]" value="<?php echo h($item['title'] ?? ''); ?>" />
+                  </td>
+                  <td>
+                    <label>Subtitle</label>
+                    <input
+                      type="text"
+                      name="subtitle[]"
+                      placeholder="defaults to show the date"
+                      value="<?php echo h($item['subtitle'] ?? ''); ?>"
+                    />
+                    <div class="help inline">Optional.</div>
+                  </td>
+                  <td>
+                    <label>Link</label>
+                    <input type="url" name="link[]" value="<?php echo h($item['link'] ?? ''); ?>" />
+                  </td>
+                  <td>
+                    <label>Icon</label>
+                    <select name="icon[]">
+                      <?php $iconValue = $item['icon'] ?? ''; ?>
+                      <option value="" <?php echo $iconValue === '' ? 'selected' : ''; ?>>None</option>
+                      <option value="mic" <?php echo $iconValue === 'mic' ? 'selected' : ''; ?>>Mic</option>
+                      <option value="instagram" <?php echo $iconValue === 'instagram' ? 'selected' : ''; ?>>Instagram</option>
+                      <option value="linkedin" <?php echo $iconValue === 'linkedin' ? 'selected' : ''; ?>>LinkedIn</option>
+                      <option value="spark" <?php echo $iconValue === 'spark' ? 'selected' : ''; ?>>Spark</option>
+                      <option value="mail" <?php echo $iconValue === 'mail' ? 'selected' : ''; ?>>Mail</option>
+                      <option value="podcast" <?php echo $iconValue === 'podcast' ? 'selected' : ''; ?>>Podcast</option>
+                      <option value="video" <?php echo $iconValue === 'video' ? 'selected' : ''; ?>>Video</option>
+                      <option value="camera" <?php echo $iconValue === 'camera' ? 'selected' : ''; ?>>Camera</option>
+                      <option value="time" <?php echo $iconValue === 'time' ? 'selected' : ''; ?>>Time</option>
+                    </select>
+                  </td>
+                  <td class="delete-cell">
+                    <label>Delete</label>
+                    <input type="checkbox" name="delete[]" value="<?php echo $rowIndex; ?>" />
+                  </td>
+                </tr>
+                <?php $rowIndex++; ?>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+            <div class="actions">
+              <button type="button" class="btn secondary js-add-row">Add row</button>
+              <button type="submit" class="btn">Save changes</button>
+            </div>
+          </div>
+        </section>
 
-        <div class="actions">
-          <button type="button" class="btn secondary js-add-row">Add row</button>
-          <button type="submit" class="btn">Save changes</button>
-        </div>
+        <details class="section section-collapsible">
+          <summary class="section-header">
+            <h2>Past</h2>
+            <div class="section-meta"><?php echo count($past); ?> entries</div>
+          </summary>
+          <div class="section-body">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Title</th>
+                  <th>Subtitle</th>
+                  <th>Link</th>
+                  <th>Icon</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody id="past-rows">
+                <?php if (!$past) : ?>
+                <tr>
+                  <td colspan="6" class="help">No past entries.</td>
+                </tr>
+                <?php endif; ?>
+                <?php foreach ($past as $item) : ?>
+                <tr class="past-row">
+                  <td>
+                    <label>Date</label>
+                    <input type="date" name="date[]" value="<?php echo h($item['date'] ?? ''); ?>" />
+                  </td>
+                  <td>
+                    <label>Title</label>
+                    <input type="text" name="title[]" value="<?php echo h($item['title'] ?? ''); ?>" />
+                  </td>
+                  <td>
+                    <label>Subtitle</label>
+                    <input
+                      type="text"
+                      name="subtitle[]"
+                      placeholder="defaults to show the date"
+                      value="<?php echo h($item['subtitle'] ?? ''); ?>"
+                    />
+                    <div class="help inline">Optional.</div>
+                  </td>
+                  <td>
+                    <label>Link</label>
+                    <input type="url" name="link[]" value="<?php echo h($item['link'] ?? ''); ?>" />
+                  </td>
+                  <td>
+                    <label>Icon</label>
+                    <select name="icon[]">
+                      <?php $iconValue = $item['icon'] ?? ''; ?>
+                      <option value="" <?php echo $iconValue === '' ? 'selected' : ''; ?>>None</option>
+                      <option value="mic" <?php echo $iconValue === 'mic' ? 'selected' : ''; ?>>Mic</option>
+                      <option value="instagram" <?php echo $iconValue === 'instagram' ? 'selected' : ''; ?>>Instagram</option>
+                      <option value="linkedin" <?php echo $iconValue === 'linkedin' ? 'selected' : ''; ?>>LinkedIn</option>
+                      <option value="spark" <?php echo $iconValue === 'spark' ? 'selected' : ''; ?>>Spark</option>
+                      <option value="mail" <?php echo $iconValue === 'mail' ? 'selected' : ''; ?>>Mail</option>
+                      <option value="podcast" <?php echo $iconValue === 'podcast' ? 'selected' : ''; ?>>Podcast</option>
+                      <option value="video" <?php echo $iconValue === 'video' ? 'selected' : ''; ?>>Video</option>
+                      <option value="camera" <?php echo $iconValue === 'camera' ? 'selected' : ''; ?>>Camera</option>
+                      <option value="time" <?php echo $iconValue === 'time' ? 'selected' : ''; ?>>Time</option>
+                    </select>
+                  </td>
+                  <td class="delete-cell">
+                    <label>Delete</label>
+                    <input type="checkbox" name="delete[]" value="<?php echo $rowIndex; ?>" />
+                  </td>
+                </tr>
+                <?php $rowIndex++; ?>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+            <div class="actions">
+              <button type="button" class="btn secondary js-add-row">Add row</button>
+              <button type="submit" class="btn">Save changes</button>
+            </div>
+          </div>
+        </details>
         <p class="help">Icons are limited to the dropdown choices.</p>
       </form>
     </main>
