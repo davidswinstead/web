@@ -637,10 +637,17 @@ if ($loggedIn) {
           <details class="csv-example">
             <summary>View CSV example</summary>
             <pre>date,title,subtitle,link,icon
+<<<<<<< HEAD
 2026-02-18,Feb 18th,Open Mic Comedy @ Cafe De Buurvrouw,https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462,mic
 2026-02-19,Feb 19th,That Comedy Thing @ Oosterbar,https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982455332265,mic
 2026-02-26,Feb 26th,That Comedy Thing @ Oosterbar,https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982461979146,mic
 2026-03-04,March 4th,Open Mic Comedy @ Cafe De Buurvrouw,https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462,mic</pre>
+=======
+2026-02-18,Open Mic Comedy @ Cafe De Buurvrouw,,https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462,mic
+2026-02-19,That Comedy Thing @ Oosterbar,,https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982455332265,mic
+2026-02-26,That Comedy Thing @ Oosterbar,,https://www.eventbrite.nl/e/that-comedy-thing-tickets-1982461979146,mic
+2026-03-04,Open Mic Comedy @ Cafe De Buurvrouw,,https://www.eventbrite.nl/e/english-comedy-open-mic-at-cafe-de-buurvrouw-pay-what-you-can-tickets-1980185943462,mic</pre>
+>>>>>>> 59609dd (ux improvements to admin)
           </details>
         </div>
 
