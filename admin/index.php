@@ -152,6 +152,52 @@ function saveLinks(PDO $pdo, $items)
   $pdo->commit();
 }
 
+function parseCsvUpload(array $file)
+{
+  if (!isset($file["tmp_name"], $file["error"]) || $file["error"] !== UPLOAD_ERR_OK) {
+    throw new RuntimeException("CSV upload failed.");
+  }
+
+  $handle = fopen($file["tmp_name"], "r");
+  if (!$handle) {
+    throw new RuntimeException("Unable to read CSV file.");
+  }
+
+  $header = fgetcsv($handle);
+  if (!$header) {
+    fclose($handle);
+    throw new RuntimeException("CSV is empty.");
+  }
+
+  $normalized = array_map(function ($value) {
+    return strtolower(trim((string) $value));
+  }, $header);
+
+  $expected = ["date", "title", "subtitle", "link", "icon"];
+  if ($normalized !== $expected) {
+    fclose($handle);
+    throw new RuntimeException("CSV header must be: date,title,subtitle,link,icon");
+  }
+
+  $items = [];
+  while (($row = fgetcsv($handle)) !== false) {
+    if (count($row) === 1 && trim((string) $row[0]) === "") {
+      continue;
+    }
+    $row = array_pad($row, 5, "");
+    $items[] = [
+      "date" => trim((string) $row[0]),
+      "title" => trim((string) $row[1]),
+      "subtitle" => trim((string) $row[2]),
+      "link" => trim((string) $row[3]),
+      "icon" => trim((string) $row[4])
+    ];
+  }
+
+  fclose($handle);
+  return $items;
+}
+
 $notice = "";
 $error = "";
 
@@ -164,6 +210,11 @@ try {
   }
 
   if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if ($loggedIn && isset($_POST["upload_csv"])) {
+      $items = parseCsvUpload($_FILES["csv_file"] ?? []);
+      saveLinks($pdo, $items);
+      $notice = "CSV uploaded successfully.";
+    } else {
     $dates = $_POST["date"] ?? [];
     $titles = $_POST["title"] ?? [];
     $subtitles = $_POST["subtitle"] ?? [];
@@ -198,8 +249,9 @@ try {
       ];
     }
 
-    saveLinks($pdo, $items);
-    $notice = "Saved successfully.";
+      saveLinks($pdo, $items);
+      $notice = "Saved successfully.";
+    }
   }
 
   $data = fetchLinks($pdo);
@@ -477,12 +529,20 @@ if ($loggedIn) {
       <div class="notice"><?php echo h($error); ?></div>
       <?php endif; ?>
 
-      <form method="post">
+      <form method="post" enctype="multipart/form-data">
         <?php $rowIndex = 0; ?>
         <div class="actions">
           <button type="button" class="btn secondary js-add-row">Add row</button>
           <button type="submit" class="btn">Save changes</button>
         </div>
+        <div class="actions" style="align-items: flex-end;">
+          <div style="flex: 1; min-width: 220px;">
+            <label for="csv_file" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Bulk CSV Upload</label>
+            <input type="file" id="csv_file" name="csv_file" accept=".csv,text/csv" />
+          </div>
+          <button type="submit" class="btn secondary" name="upload_csv" value="1">Upload CSV</button>
+        </div>
+        <div class="help">Upload replaces all rows. CSV header must be: <strong>date,title,subtitle,link,icon</strong>.</div>
         <h2>Upcoming</h2>
         <table>
           <thead>
