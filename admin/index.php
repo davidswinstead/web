@@ -39,9 +39,22 @@ if (!isLoggedIn() && $_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 if (isset($_GET["logout"])) {
-    session_destroy();
-    header("Refresh: 0");
-    exit;
+  $_SESSION = [];
+  if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(
+      session_name(),
+      "",
+      time() - 42000,
+      $params["path"],
+      $params["domain"],
+      $params["secure"],
+      $params["httponly"]
+    );
+  }
+  session_destroy();
+  header("Location: index.php");
+  exit;
 }
 
 $loggedIn = isLoggedIn();
