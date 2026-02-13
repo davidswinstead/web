@@ -655,7 +655,7 @@ if ($loggedIn) {
         </td>
         <td class="delete-cell">
           <label>Delete</label>
-          <input type="checkbox" name="delete[]" value="-1" disabled />
+          <button type="button" class="btn secondary js-remove-row">Remove</button>
         </td>
       </tr>
     </template>
@@ -679,6 +679,16 @@ if ($loggedIn) {
           }
           rows.appendChild(clone);
         });
+      });
+
+      rows.addEventListener("click", (event) => {
+        const target = event.target;
+        if (target instanceof HTMLElement && target.classList.contains("js-remove-row")) {
+          const row = target.closest("tr");
+          if (row) {
+            row.remove();
+          }
+        }
       });
     </script>
     <?php endif; ?>
