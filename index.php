@@ -121,7 +121,7 @@ $iconMap = [
           <li class="link-item">
             <a
               class="link-button"
-              href="https://www.instagram.com/spinstead.gif/"
+              href="https://www.instagram.com/swinstead.lol/"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -129,7 +129,7 @@ $iconMap = [
                 <img src="instagram.png" alt="Instagram" loading="lazy" />
               </span>
               <span class="link-text">
-                <span class="link-title">@spinstead.gif</span>
+                <span class="link-title">@swinstead.lol</span>
                 <span class="link-subtitle">Instagram</span>
               </span>
             </a>
