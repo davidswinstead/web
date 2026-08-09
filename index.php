@@ -74,8 +74,7 @@ $iconMap = [
       <section class="content">
         <div class="profile">
           <div class="identity">
-            <h1 class="name">David Swinstead</h1>
-            <p class="bio">New comic, UK born, Amsterdam based.</p>
+            <h1 class="name">David Swinstead</h1><h4>(they/them)</h4>
           </div>
         </div>
         <ul class="links" id="links">
