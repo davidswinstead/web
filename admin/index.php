@@ -827,8 +827,8 @@ if ($loggedIn) {
         <td>
           <label>Icon</label>
           <select name="icon[]">
-            <option value="" selected>None</option>
-            <option value="mic">Mic</option>
+            <option value="">None</option>
+            <option value="mic" selected>Mic</option>
             <option value="instagram">Instagram</option>
             <option value="linkedin">LinkedIn</option>
             <option value="spark">Spark</option>
