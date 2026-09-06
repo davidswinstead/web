@@ -21,7 +21,7 @@ body {
   min-height: 100vh;
   color: var(--text-main);
   background: linear-gradient(135deg, rgba(8, 9, 10, 0.7), rgba(14, 18, 20, 0.75)),
-    url("background.png") var(--face-x) calc(var(--face-y) + var(--face-shift-y)) / cover no-repeat fixed;
+    url("background_tile.png") var(--face-x) calc(var(--face-y) + var(--face-shift-y)) / cover no-repeat fixed;
 }
 
 .page {
@@ -154,7 +154,7 @@ body {
     --face-y: 39.3%;
     --face-shift-y: -22vh;
     background: linear-gradient(135deg, rgba(8, 9, 10, 0.7), rgba(14, 18, 20, 0.75)),
-      url("background.png") var(--face-x) calc(var(--face-y) + var(--face-shift-y)) / 220% auto no-repeat;
+      url("background_tile.png") var(--face-x) calc(var(--face-y) + var(--face-shift-y)) / 220% auto no-repeat;
     background-attachment: scroll;
   }
 
