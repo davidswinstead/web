@@ -17,8 +17,7 @@ body {
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
   color: var(--text-main);
-  background: linear-gradient(135deg, rgba(8, 9, 10, 0.7), rgba(14, 18, 20, 0.75)),
-    url("background_tile.png") / 360px auto repeat fixed;
+  background: url("background_tile.png") repeat fixed;
 }
 
 .page {
@@ -146,12 +145,6 @@ body {
 }
 
 @media (max-width: 540px) {
-  body {
-    background: linear-gradient(135deg, rgba(8, 9, 10, 0.7), rgba(14, 18, 20, 0.75)),
-      url("background_tile.png") / 280px auto repeat;
-    background-attachment: scroll;
-  }
-
   .page {
     padding-top: 140px;
   }
