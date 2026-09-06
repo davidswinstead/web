@@ -17,7 +17,7 @@ body {
   font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
   color: var(--text-main);
-  background: linear-gradient(rgba(8, 9, 10, 0.7), rgba(8, 9, 10, 0.7)),
+  background: linear-gradient(rgba(8, 9, 10, 0.8), rgba(8, 9, 10, 0.8)),
     url("background_tile.png") repeat fixed;
 }
 
